@@ -71,16 +71,18 @@ class MockPredisClient extends Predis\Client implements PermanentServiceInterfac
     }
 
     /**
-     * @param  string $key
+     * @param  string[] $keys
      * @return bool
      */
-    public function del($key)
+    public function del(array $keys)
     {
         if (!$this->available) {
             return false;
         }
 
-        unset(self::$data[$key]);
+        foreach ($keys as $key) {
+            unset(self::$data[$key]);
+        }
 
         return true;
     }
@@ -91,5 +93,44 @@ class MockPredisClient extends Predis\Client implements PermanentServiceInterfac
     public function setAvailable($available)
     {
         $this->available = (bool) $available;
+    }
+
+    /**
+     * @param      $key
+     * @param      $value
+     * @param null $expireResolution
+     * @param null $expireTTL
+     * @param null $flag
+     *
+     * @return bool
+     */
+    public function set($key, $value, $expireResolution = null, $expireTTL = null, $flag = null)
+    {
+        if (!$this->available) {
+            return false;
+        }
+
+        self::$data[$key] = (string) $value;
+
+        return true;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     *
+     * @return string|null
+     */
+    public function getset($key, $value)
+    {
+        if (!$this->available) {
+            return false;
+        }
+
+        $oldValue = $this->get($key);
+
+        $this->set($key, $value);
+
+        return $oldValue;
     }
 }
