@@ -20,10 +20,9 @@ class ResolvedHostnameLockInformationProvider extends BasicLockInformationProvid
      */
     public function getLockInformation()
     {
-        $params = parent::gatherInformation();
-        $params[] = gethostbyname(gethostname());
+        $params = parent::getLockInformation();
+        $params['hostIp'] = gethostbyname(gethostname());
 
         return $params;
     }
-
 }
